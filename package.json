@@ -1,0 +1,18 @@
+{
+  "name": "hello-hedera-js-sdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@hashgraph/sdk": "^2.67.0",
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "hashconnect": "^3.0.13"
+  }
+}

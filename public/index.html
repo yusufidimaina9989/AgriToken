@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hedera OnChain TodoList</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9fafb;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #2d3748;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    input[type="text"] {
+      padding: 0.5rem;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #059669;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    li {
+      background: white;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .explorer-link {
+      font-size: 0.85rem;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    .explorer-link a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+
+    .explorer-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 Hedera OnChain TodoList</h1>
+  <form id="todoForm">
+    <input type="text" id="taskInput" placeholder="Enter your task..." required />
+    <button type="submit">Add</button>
+  </form>
+
+  <ul id="taskList"></ul>
+  <div class="explorer-link" id="explorerLink"></div>
+
+  <script>
+    const form = document.getElementById('todoForm');
+    const input = document.getElementById('taskInput');
+    const list = document.getElementById('taskList');
+    const explorerDiv = document.getElementById('explorerLink');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const task = input.value.trim();
+      if (!task) return;
+      const res = await fetch('/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task })
+      });
+      const data = await res.json();
+      showExplorerLink(data.explorer);
+      input.value = '';
+      loadTasks();
+    });
+
+    async function loadTasks() {
+      const res = await fetch('/tasks');
+      const tasks = await res.json();
+      list.innerHTML = '';
+      tasks.filter(t => !t.done).forEach(({ task }) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${task}</span>
+          <input type="checkbox" />
+        `;
+        li.querySelector('input').addEventListener('change', async () => {
+          const response = await fetch('/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ task })
+          });
+          const result = await response.json();
+          showExplorerLink(result.explorer);
+          li.remove();
+        });
+        list.appendChild(li);
+      });
+    }
+
+    function showExplorerLink(url) {
+      explorerDiv.innerHTML = `✅ <a href="${url}" target="_blank">txId : Check block explorer</a>`;
+      setTimeout(() => explorerDiv.innerHTML = '', 8000);
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
