@@ -1,5 +1,5 @@
 {
-  "name": "hello-hedera-js-sdk",
+  "name": "agri-token",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "@hashgraph/sdk": "^2.67.0",
+    "cors": "^2.8.5",
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "hashconnect": "^3.0.13"

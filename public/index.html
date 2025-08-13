@@ -1,145 +1,479 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hedera OnChain TodoList</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f9fafb;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AgriToken | Tokenizing Africa's Agricultural Potential</title>
+    <link rel="icon" type="image/png" href="./images/AgriToken.png" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
 
-    h1 {
-      color: #2d3748;
-      margin-bottom: 1rem;
-    }
+    <link
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+      rel="stylesheet" />
 
-    form {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    input[type="text"] {
-      padding: 0.5rem;
-      width: 250px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+    <canvas id="performanceChart" height="250"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hashconnect/dist/hashconnect.umd.js"></script>
+  </head>
+  <body>
+    <div id="notificationContainer"></div>
 
-    button {
-      padding: 0.5rem 1rem;
-      background-color: #10b981;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+    <div class="back-to-top" id="backToTop">
+      <i class="fas fa-arrow-up"></i>
+    </div>
 
-    button:hover {
-      background-color: #059669;
-    }
+    <!-- Header -->
+    <header>
+      <div class="container header-container">
+        <div class="logo" id="homeLink">
+          <div class="logo-icon">
+            <i class="fas fa-seedling"></i>
+          </div>
+          <div class="logo-text">Agri<span>Token</span></div>
+        </div>
+        <nav>
+          <ul>
+            <li>
+              <a href="#home"><i class="fas fa-home"></i> Home</a>
+            </li>
+            <li>
+              <a href="#investments"
+                ><i class="fas fa-leaf"></i> Farms to Invest</a
+              >
+            </li>
+            <li>
+              <a href="#dashboard"
+                ><i class="fas fa-chart-line"></i> Dashboard</a
+              >
+            </li>
+            <li>
+              <a href="#portfolio"><i class="fas fa-wallet"></i> Portfolio</a>
+            </li>
+          </ul>
+        </nav>
+        <div class="user-actions">
+          <div id="walletInfo" class="wallet-info" style="display: none">
+            <i class="fas fa-wallet"></i>
+            <span id="accountId"></span>
+            <span
+              id="balanceInfo"
+              style="margin-left: 10px; font-size: 0.9em"></span>
+          </div>
+          <button class="wallet-btn" id="connectWalletBtn">
+            <i class="fas fa-wallet"></i>
+            <span id="btnText">Connect Wallet</span>
+          </button>
+          <div class="user-profile">
+            <i class="fas fa-user-circle fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+      <div class="container hero-content">
+        <h1>Tokenizing Africa's Agricultural Potential</h1>
+        <p>
+          Empowering smallholder farmers through blockchain technology. Invest
+          in Africa's future while earning sustainable returns.
+        </p>
+        <div class="cta-buttons">
+          <a href="#dashboard" class="btn btn-primary">Tokenize Your Farm</a>
+          <a href="#investments" class="btn btn-secondary"
+            >Explore Investments</a
+          >
+        </div>
+      </div>
+    </section>
 
-    ul {
-      list-style-type: none;
-      padding: 0;
-      width: 100%;
-      max-width: 360px;
-    }
+    <div class="modal" id="roleModal">
+      <div class="modal-content">
+        <h3>Welcome to AgriToken!</h3>
+        <p>Please select your role:</p>
+        <div class="role-options">
+          <div class="role-card" id="farmerRole">
+            <i class="fas fa-tractor"></i>
+            <span>I'm a Farmer</span>
+          </div>
+          <div class="role-card" id="investorRole">
+            <i class="fas fa-chart-line"></i>
+            <span>I'm an Investor</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    li {
-      background: white;
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
+    <!-- modal for farmer registration -->
+    <div class="modal" id="registerModal">
+      <div class="modal-content">
+        <h3>Complete Your Farmer Profile</h3>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="farmerName">Full Name</label>
+            <input type="text" id="farmerName" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="nin">National ID (NIN)</label>
+            <input type="text" id="nin" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="crops">Crops You Farm (comma separated)</label>
+            <input
+              type="text"
+              id="crops"
+              class="form-control"
+              placeholder="e.g., maize, rice, cassava"
+              required />
+          </div>
+          <button type="submit" class="btn-submit">Register as Farmer</button>
+        </form>
+      </div>
+    </div>
 
-    .explorer-link {
-      font-size: 0.85rem;
-      margin-top: 4px;
-      text-align: center;
-    }
+    <!-- How It Works -->
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-title">
+          <h2>How AgriToken Works</h2>
+          <p>
+            Transforming agricultural assets into digital investments on the
+            Hedera network
+          </p>
+        </div>
+        <div class="steps">
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-user-check"></i>
+            </div>
+            <h3>Farmer Registration</h3>
+            <p>
+              Farmers register their farms and crops through our platform with
+              their Hedera wallet
+            </p>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-cube"></i>
+            </div>
+            <h3>Asset Tokenization</h3>
+            <p>
+              Crop yields are verified and tokenized using Hedera Token Service
+              (HTS)
+            </p>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-hand-holding-usd"></i>
+            </div>
+            <h3>Investment Marketplace</h3>
+            <p>
+              Investors can purchase tokenized yields and support farmers
+              directly
+            </p>
+          </div>
+          <div class="step-card">
+            <div class="step-icon">
+              <i class="fas fa-truck-loading"></i>
+            </div>
+            <h3>Harvest & Payout</h3>
+            <p>
+              At harvest, investors receive returns while farmers gain fair
+              prices
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    .explorer-link a {
-      color: #3b82f6;
-      text-decoration: none;
-    }
+    <!-- Farmer Dashboard -->
+    <section class="section" id="dashboard">
+      <div class="container">
+        <div class="section-title">
+          <h2>Farmer Dashboard</h2>
+          <p>Manage your farm, tokenize yields, and track your earnings</p>
+        </div>
 
-    .explorer-link a:hover {
-      text-decoration: underline;
-    }
-  </style>
-</head>
-<body>
-  <h1>📝 Hedera OnChain TodoList</h1>
-  <form id="todoForm">
-    <input type="text" id="taskInput" placeholder="Enter your task..." required />
-    <button type="submit">Add</button>
-  </form>
+        <div class="dashboard">
+          <div class="dashboard-header">
+            <h3><i class="fas fa-tractor"></i> My Farm Operations</h3>
+            <div class="wallet-balance">
+              <span>Balance: </span>
+              <strong><span id="tokenBalance"></span></strong> ($<span
+                id="tokenValue"
+                >0</span
+              >)
+            </div>
+          </div>
 
-  <ul id="taskList"></ul>
-  <div class="explorer-link" id="explorerLink"></div>
+          <div class="dashboard-content">
+            <div class="dashboard-card">
+              <h4><i class="fas fa-plus-circle"></i> Tokenize New Yield</h4>
+              <form id="tokenizeForm">
+                <div class="form-group">
+                  <label for="cropType">Crop Type</label>
+                  <select class="form-control" id="cropType" required>
+                    <option value="">Select crop type</option>
+                    <option>Rice</option>
+                    <option>Wheat</option>
+                    <option>Maize</option>
+                    <option>Millet</option>
+                    <option>Cocoa</option>
+                    <option>Ginger</option>
+                    <option>Beans</option>
+                    <option>Groundnut</option>
+                    <option>Tomato</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="yieldAmount">Yield Amount (kg)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="yieldAmount"
+                    placeholder="Enter yield amount"
+                    min="100"
+                    required />
+                </div>
+                <div class="form-group">
+                  <label for="harvestDate">Expected Harvest Date</label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="harvestDate"
+                    required />
+                </div>
+                <div class="form-group">
+                  <label for="tokenValue">Token Value per kg ($)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="tokenPrice"
+                    placeholder="Enter token value"
+                    min="0.1"
+                    step="0.01"
+                    required />
+                </div>
+                <div class="form-group">
+                  <label for="roi">expected ROI (%)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="roi"
+                    placeholder="Enter expected ROI"
+                    required />
+                </div>
+                <div class="form-group">
+                  <label>Ownership Structure</label>
+                  <div class="ownership-structure">
+                    <div class="ownership-item">
+                      <span>Farmer Retention</span>
+                      <input
+                        type="range"
+                        class="ownership-slider"
+                        id="farmerShare"
+                        min="60"
+                        max="80"
+                        value="60" />
+                      <span class="ownership-percent" id="farmerPercent"
+                        >60%</span
+                      >
+                    </div>
+                    <div class="ownership-item">
+                      <span>Investor Allocation</span>
+                      <span class="ownership-percent" id="investorPercent"
+                        >40%</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" class="btn-submit">
+                  Tokenize on Hedera
+                </button>
+              </form>
+            </div>
 
-  <script>
-    const form = document.getElementById('todoForm');
-    const input = document.getElementById('taskInput');
-    const list = document.getElementById('taskList');
-    const explorerDiv = document.getElementById('explorerLink');
+            <div class="dashboard-card">
+              <h4><i class="fas fa-chart-bar"></i> My Tokenized Assets</h4>
+              <div
+                id="tokenizedAssetsList"
+                style="max-height: 300px; overflow-y: auto"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const task = input.value.trim();
-      if (!task) return;
-      const res = await fetch('/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ task })
-      });
-      const data = await res.json();
-      showExplorerLink(data.explorer);
-      input.value = '';
-      loadTasks();
-    });
+    <!-- Tokenized Assets -->
+    <section class="section" id="investments">
+      <div class="container">
+        <div class="section-title">
+          <h2>Available Investments</h2>
+          <p>Browse tokenized farm yields ready for investment</p>
+        </div>
 
-    async function loadTasks() {
-      const res = await fetch('/tasks');
-      const tasks = await res.json();
-      list.innerHTML = '';
-      tasks.filter(t => !t.done).forEach(({ task }) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <span>${task}</span>
-          <input type="checkbox" />
-        `;
-        li.querySelector('input').addEventListener('change', async () => {
-          const response = await fetch('/complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ task })
-          });
-          const result = await response.json();
-          showExplorerLink(result.explorer);
-          li.remove();
-        });
-        list.appendChild(li);
-      });
-    }
+        <div class="assets-grid" id="assetsGrid"></div>
+      </div>
+    </section>
 
-    function showExplorerLink(url) {
-      explorerDiv.innerHTML = `✅ <a href="${url}" target="_blank">txId : Check block explorer</a>`;
-      setTimeout(() => explorerDiv.innerHTML = '', 8000);
-    }
+    <!-- Portfolio Section -->
+    <section class="section" id="portfolio">
+      <div class="container">
+        <div class="section-title">
+          <h2>My Investment Portfolio</h2>
+          <p>Track your agricultural investments and returns</p>
+        </div>
 
-    loadTasks();
-  </script>
-</body>
+        <div class="dashboard">
+          <div class="dashboard-header">
+            <h3><i class="fas fa-chart-pie"></i> Investment Overview</h3>
+            <div class="wallet-balance">
+              <span>Total Value: </span>
+              <strong>$<span id="portfolioValue"></span></strong>
+            </div>
+          </div>
+
+          <div class="dashboard-content">
+            <div class="dashboard-card">
+              <h4><i class="fas fa-coins"></i> My Investments</h4>
+              <div id="portfolioList"></div>
+            </div>
+
+            <div class="dashboard-card" style="position: relative">
+              <h4><i class="fas fa-chart-line"></i> Performance</h4>
+              <canvas
+                id="performanceChart"
+                style="width: 100%; height: 400px"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+      <div class="container">
+        <div class="section-title">
+          <h2>Why Choose AgriToken?</h2>
+          <p>
+            Powered by Hedera's enterprise-grade Distributed Ledger Technology
+          </p>
+        </div>
+
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <h3>Secure & Transparent</h3>
+            <p>All transactions recorded on Hedera's immutable public ledger</p>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <h3>Ultra-Fast</h3>
+            <p>Near real-time settlement with 10,000+ TPS on Hedera</p>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <i class="fas fa-leaf"></i>
+            </div>
+            <h3>Sustainable</h3>
+            <p>Carbon-negative network with minimal energy consumption</p>
+          </div>
+
+          <div class="benefit-card">
+            <div class="benefit-icon">
+              <i class="fas fa-coins"></i>
+            </div>
+            <h3>Low Fees</h3>
+            <p>Fractional transaction costs compared to traditional finance</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="farms">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <h4>AgriToken</h4>
+            <p>
+              Empowering Africa's agricultural sector through Hedera's
+              tokenization and decentralized finance.
+            </p>
+            <div class="social-links">
+              <a href="https://x.com/gashinge9989"
+                ><i class="fab fa-twitter"></i
+              ></a>
+              <a href="https://facebook.com/yusuf.idrismaina/"
+                ><i class="fab fa-facebook-f"></i
+              ></a>
+              <a href="https://www.linkedin.com/in/yusuf-idi-maina-017a34251/"
+                ><i class="fab fa-linkedin-in"></i
+              ></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+
+          <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#investments">Investments</a></li>
+              <li><a href="#dashboard">Dashboard</a></li>
+              <li><a href="#portfolio">Portfolio</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Resources</h4>
+            <ul>
+              <li><a href="#">Documentation</a></li>
+              <li><a href="#">Token Economics</a></li>
+              <li><a href="#">Farmers Guide</a></li>
+              <li><a href="#">Investor Portal</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4>Contact Us</h4>
+            <ul>
+              <li><i class="fas fa-envelope"></i>yusufedresmaina@gmail.com</li>
+              <li><i class="fas fa-phone"></i> +234 703 480 521</li>
+              <li><i class="fas fa-map-marker-alt"></i> Abuja, Nigeria</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="copyright">
+          <p>&copy; 2025 AgriToken All rights reserved.</p>
+          <p>Built on Hedera Fully with Hashgraph sdk</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="index.js"></script>
+  </body>
 </html>
