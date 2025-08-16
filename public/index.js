@@ -1,4 +1,7 @@
-const API_BASE_URL = process.env.API_URL || "http://localhost:3001";
+const API_BASE_URL =
+  process.env.API_URL === "production"
+    ? "https://agritoken.onrender.com"
+    : "http://localhost:3001";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Form submission handler
