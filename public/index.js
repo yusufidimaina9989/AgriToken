@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  process.env.API_URL === "production"
+  window.location.hostname === "agritoken.onrender.com"
     ? "https://agritoken.onrender.com"
     : "http://localhost:3001";
 
