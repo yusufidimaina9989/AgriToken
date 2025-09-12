@@ -1,6 +1,6 @@
 const API_BASE_URL =
-  window.location.hostname === "agritoken.onrender.com"
-    ? "https://agritoken.onrender.com"
+  window.location.hostname === "agritoken-production.up.railway.app"
+    ? "https://agritoken-production.up.railway.app/"
     : "http://localhost:3001";
 
 document.addEventListener("DOMContentLoaded", () => {
