@@ -1,5 +1,5 @@
 # AgriToken
-AgriToken project is a blockchain-based system designed to digitize and tokenize agricultural assets. Its main idea is to represent farm produce as digital tokens on Hedera Ledger Technology, allowing farmers, buyers, and investors to trade and verify ownership securely.
+AgriToken project is a blockchain-based system designed to digitize and tokenize agricultural assets. Its main idea is to represent farm produce as digital tokens on Hedera Ledger Technology, allowing farmers and investors to trade securely.
 
 you can visit [AgriToken](https://agritoken.onrender.com/#home) to tokenized and invest in crops and farm produce.
 
@@ -17,8 +17,32 @@ you can visit [AgriToken](https://agritoken.onrender.com/#home) to tokenized and
 - **Blockchain:** Hedera Hashgraph SDK (HTS + HCS)
 - **Wallet Integration:** MetaMask
 
+## Setup Steps
+```sh
+# Clone the repository
+git clone https://github.com/yusufidimaina9989/AgriToken.git
 
-certificate link : [certificate links].(https://certs.hashgraphdev.com/2e1dfa55-8168-4852-8a7b-42a85fcf2df4.pdf)
+# Navigate into project
+cd agritoken
+
+# Install dependencies
+npm install
+
+# Start the development server
+node server.js
+
+# By default, the server runs on http://localhost:3001
+
+
+```
+
+## Certificate & Pitch Deck Links
+
+- certificate link : [certificate links].(https://certs.hashgraphdev.com/2e1dfa55-8168-4852-8a7b-42a85fcf2df4.pdf)
+
+- pitch deck link : [Pitch Deck](https://mypitch-deck.netlify.app/)
+  
+- Demo :  [AgriToken](https://agritoken.onrender.com/#home)
 
 
 NOTE: as we deploy on render sometimes visitors have to wait for 30 sec before the page loads
