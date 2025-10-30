@@ -33,6 +33,9 @@ node server.js
 
 # By default, the server runs on http://localhost:3001
 
+# add accountId and privateKey in your local .env
+MY_ACCOUNT_ID=xxxxxxxxxxxxxxxxxxxxx
+MY_PRIVATE_KEY=xxxxxxxxxxxxxxxxxxxx
 
 ```
 
